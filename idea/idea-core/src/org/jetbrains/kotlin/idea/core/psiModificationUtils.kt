@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.getLambdaArgumentName
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -186,6 +187,18 @@ fun KtDeclaration.implicitVisibility(): KtModifierKeywordToken? {
         KtTokens.DEFAULT_VISIBILITY_KEYWORD
     }
     return defaultVisibilityKeyword
+}
+
+fun KtDeclaration.implicitModality(): KtModifierKeywordToken {
+    if (hasModifier(KtTokens.OVERRIDE_KEYWORD)) {
+        val klass = containingClassOrObject ?: return KtTokens.FINAL_KEYWORD
+        if (klass.hasModifier(KtTokens.ABSTRACT_KEYWORD) ||
+            klass.hasModifier(KtTokens.OPEN_KEYWORD) ||
+            klass.hasModifier(KtTokens.SEALED_KEYWORD)) {
+            return KtTokens.OPEN_KEYWORD
+        }
+    }
+    return KtTokens.FINAL_KEYWORD
 }
 
 fun KtSecondaryConstructor.getOrCreateBody(): KtBlockExpression {
