@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.builtins
+package org.jetbrains.kotlin.resolve.lazy
 
-import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 
-class DefaultBuiltIns private constructor() : KotlinBuiltIns(LockBasedStorageManager()) {
-    companion object {
-        private val initializer = BuiltInsInitializer {
-            DefaultBuiltIns()
-        }
-
-        @JvmStatic
-        val Instance: DefaultBuiltIns
-            get() = initializer.get()
-    }
-}
+class ResolveSessionBasedPackageFragmentProvider(
+        private val resolveSession: ResolveSession
+) : PackageFragmentProvider by resolveSession.packageFragmentProvider

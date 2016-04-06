@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.analyzer.AnalysisResult;
 import org.jetbrains.kotlin.context.ContextKt;
 import org.jetbrains.kotlin.context.ModuleContext;
 import org.jetbrains.kotlin.context.MutableModuleContext;
+import org.jetbrains.kotlin.context.ProjectContext;
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor;
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider;
 import org.jetbrains.kotlin.descriptors.PackagePartProvider;
@@ -161,8 +162,10 @@ public enum TopDownAnalyzerFacadeForJVM {
 
     @NotNull
     public static MutableModuleContext createContextWithSealedModule(@NotNull Project project, @NotNull String moduleName) {
+        ProjectContext projectContext = ContextKt.ProjectContext(project);
         MutableModuleContext context = ContextKt.ContextForNewModule(
-                project, Name.special("<" + moduleName + ">"), JvmPlatform.INSTANCE, JvmBuiltIns.getInstance()
+                projectContext, Name.special("<" + moduleName + ">"), JvmPlatform.INSTANCE,
+                new JvmBuiltIns(projectContext.getStorageManager())
         );
         context.setDependencies(context.getModule(), context.getBuiltIns().getBuiltInsModule());
         return context;

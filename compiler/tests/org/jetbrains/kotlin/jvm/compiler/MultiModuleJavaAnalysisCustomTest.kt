@@ -60,9 +60,10 @@ class MultiModuleJavaAnalysisCustomTest : KtUsefulTestCase() {
         val moduleDirs = File(PATH_TO_TEST_ROOT_DIR).listFiles { it -> it.isDirectory }!!
         val environment = createEnvironment(moduleDirs)
         val modules = setupModules(environment, moduleDirs)
+        val projectContext = ProjectContext(environment.project)
         val resolverForProject = JvmAnalyzerFacade.setupResolverForProject(
                 "test",
-                ProjectContext(environment.project), modules,
+                projectContext, modules,
                 { m -> ModuleContent(m.kotlinFiles, m.javaFilesScope) },
                 JvmPlatformParameters {
                     javaClass ->
@@ -70,7 +71,7 @@ class MultiModuleJavaAnalysisCustomTest : KtUsefulTestCase() {
                     modules.first { it._name == moduleName }
                 },
                 CompilerEnvironment,
-                builtInsFactory = { JvmBuiltIns.Instance },
+                builtInsFactory = { JvmBuiltIns(projectContext.storageManager) },
                 packagePartProviderFactory = { a, b -> JvmPackagePartProvider(environment) }
         )
 

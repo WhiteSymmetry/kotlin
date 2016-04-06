@@ -127,6 +127,7 @@ fun createContainerForLazyResolve(
 
     targetEnvironment.configure(this)
 
+    useImpl<ResolveSessionBasedPackageFragmentProvider>()
     useImpl<LazyResolveToken>()
     useImpl<ResolveSession>()
 }

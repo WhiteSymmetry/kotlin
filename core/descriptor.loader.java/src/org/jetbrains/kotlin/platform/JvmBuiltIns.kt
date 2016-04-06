@@ -16,23 +16,29 @@
 
 package org.jetbrains.kotlin.platform
 
-import org.jetbrains.kotlin.builtins.BuiltInsInitializer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.load.kotlin.BuiltInClassesAreSerializableOnJvm
 import org.jetbrains.kotlin.serialization.deserialization.AdditionalClassPartsProvider
+import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.utils.sure
+import javax.inject.Inject
 
-class JvmBuiltIns private constructor() : KotlinBuiltIns() {
-    companion object {
-        private val initializer = BuiltInsInitializer {
-            JvmBuiltIns()
-        }
+class JvmBuiltIns(storageManager: StorageManager) : KotlinBuiltIns(storageManager) {
+    private var ownerModuleDescriptor: ModuleDescriptor? = null
 
-        @JvmStatic
-        val Instance: KotlinBuiltIns
-            get() = initializer.get()
+    @Inject
+    fun setOwnerModuleDescriptor(moduleDescriptor: ModuleDescriptor) {
+        this.ownerModuleDescriptor = moduleDescriptor
     }
 
+    // Used in container
+    @Suppress("unused")
+    val isInitialized: Boolean get() = ownerModuleDescriptor != null
+
     override fun getAdditionalClassPartsProvider(): AdditionalClassPartsProvider {
-        return BuiltInClassesAreSerializableOnJvm(builtInsModule)
+        return BuiltInClassesAreSerializableOnJvm(builtInsModule, {
+            ownerModuleDescriptor.sure { "JvmBuiltins has not been initialized properly" }
+        })
     }
 }

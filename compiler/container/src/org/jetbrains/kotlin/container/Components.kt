@@ -25,8 +25,18 @@ class InstanceComponentDescriptor(val instance: Any) : ComponentDescriptor {
 
     override fun getDependencies(context: ValueResolveContext): Collection<Class<*>> = emptyList()
 
+    override val shouldInjectProperties: Boolean
+        get() = instance.hasIsInitializedMethodReturnsFalse() && instance.javaClass.getInfo().setterInfos.isNotEmpty()
+
     override fun toString(): String {
         return "Instance: ${instance.javaClass.simpleName}"
     }
 }
 
+private fun Any.hasIsInitializedMethodReturnsFalse(): Boolean {
+    val method = javaClass.methods.firstOrNull { it.name == "isInitialized" && it.parameterTypes.isEmpty() } ?: return false
+
+    return !try {
+        (method.invoke(this) as? Boolean) ?: false
+    } catch (e: InvocationTargetException) { false }
+}

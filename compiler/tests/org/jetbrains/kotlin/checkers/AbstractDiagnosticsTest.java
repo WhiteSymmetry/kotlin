@@ -355,7 +355,8 @@ public abstract class AbstractDiagnosticsTest extends BaseDiagnosticsTest {
 
     @NotNull
     protected ModuleDescriptorImpl createModule(@NotNull String moduleName, @NotNull StorageManager storageManager) {
-        return TargetPlatformKt.createModule(JvmPlatform.INSTANCE, Name.special(moduleName), storageManager, JvmBuiltIns.getInstance());
+        return TargetPlatformKt.createModule(
+                JvmPlatform.INSTANCE, Name.special(moduleName), storageManager, new JvmBuiltIns(storageManager));
     }
 
     @NotNull

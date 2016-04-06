@@ -242,7 +242,7 @@ private fun globalResolveSessionProvider(
 
     val builtInsFactory: () -> KotlinBuiltIns = when (platform) {
         is JsPlatform -> { -> JsPlatform.builtIns }
-        is JvmPlatform -> { -> JvmBuiltIns.Instance }
+        is JvmPlatform -> { -> JvmBuiltIns(globalContext.storageManager) }
         else -> { -> DefaultBuiltIns.Instance }
     }
 
