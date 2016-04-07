@@ -306,7 +306,7 @@ private class FileLibraryScope(project: Project, private val libraryRoot: Virtua
     val cachedEntries : MutableSet<VirtualFile> = hashSetOf()
 
     override fun contains(file: VirtualFile): Boolean =
-        VfsUtilCore.isAncestor(file, libraryRoot, false)
+        VfsUtilCore.isAncestor(libraryRoot, file, false)
 
     override fun isSearchInLibraries(): Boolean = true
     override fun isSearchInModuleContent(aModule: Module): Boolean = false
