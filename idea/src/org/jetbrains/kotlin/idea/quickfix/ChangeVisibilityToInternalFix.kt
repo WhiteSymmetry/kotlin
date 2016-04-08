@@ -21,6 +21,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
+import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory3
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
@@ -56,6 +57,7 @@ class ChangeVisibilityToInternalFix(element: KtModifierListOwner, private val el
             val module = DescriptorUtils.getContainingModule(descriptor)
             if (module != usageModule) return null
             val declaration = DescriptorToSourceUtils.getSourceFromDescriptor(descriptor) as? KtModifierListOwner ?: return null
+            if (descriptor.visibility != Visibilities.PRIVATE) return null
             return ChangeVisibilityToInternalFix(declaration, descriptor.name.asString())
         }
     }
