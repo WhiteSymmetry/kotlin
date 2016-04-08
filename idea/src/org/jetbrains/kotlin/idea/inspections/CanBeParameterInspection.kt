@@ -42,7 +42,7 @@ import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
 
 class CanBeParameterInspection : AbstractKotlinInspection() {
     private fun PsiReference.usedAsPropertyIn(klass: KtClass): Boolean {
-        if (this !is KtSimpleNameReference) return false
+        if (this !is KtSimpleNameReference) return true
         val nameExpression = element
         // this.x
         val parent = element.parent
