@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory3
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
+import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
@@ -35,12 +36,17 @@ import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
-class ChangeVisibilityToInternalFix(element: KtModifierListOwner, private val elementName: String) : KotlinQuickFixAction<KtModifierListOwner>(element), CleanupFix {
-    override fun getText() = "Make $elementName internal"
-    override fun getFamilyName() = "Make internal"
+class IncreaseVisibilityFix(
+        element: KtModifierListOwner,
+        private val elementName: String,
+        private val visibilityModifier: KtModifierKeywordToken
+) : KotlinQuickFixAction<KtModifierListOwner>(element), CleanupFix {
+
+    override fun getText() = "Make $elementName $visibilityModifier"
+    override fun getFamilyName() = "Make $visibilityModifier"
 
     override fun invoke(project: Project, editor: Editor?, file: KtFile) {
-        element.addModifier(KtTokens.INTERNAL_KEYWORD)
+        element.addModifier(visibilityModifier)
     }
 
     companion object : KotlinSingleIntentionActionFactory() {
@@ -58,7 +64,7 @@ class ChangeVisibilityToInternalFix(element: KtModifierListOwner, private val el
             if (module != usageModule) return null
             val declaration = DescriptorToSourceUtils.getSourceFromDescriptor(descriptor) as? KtModifierListOwner ?: return null
             if (descriptor.visibility != Visibilities.PRIVATE) return null
-            return ChangeVisibilityToInternalFix(declaration, descriptor.name.asString())
+            return IncreaseVisibilityFix(declaration, descriptor.name.asString(), KtTokens.INTERNAL_KEYWORD)
         }
     }
 }
